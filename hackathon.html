@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>simple web3 Wallet</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+</head>
+<body>
+  <head>
+<style>
+h1 {
+  text-align: center;
+}
+p {text-align: center;}
+div {text-align: center;}
+
+
+</style>
+</head>
+<style>
+body {
+  background-image: url('https://preview.redd.it/best-place-to-find-background-assets-like-these-iconic-v0-ueg7qroin2vc1.png?auto=webp&s=adad0e7c170fa3cafbe3e996bb6ca96b4e5a140c');
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+}
+</style>
+
+
+<body>
+  
+    <h1 style="border: 2px solid black; padding: 10px;"style="color: blue;"><marquee> ETHEREUM&nbsp;  WALLET&nbsp; TRACKER&nbsp;  and&nbsp;  PORTFOLIO</h1></marquee> 
+   <img src="https://img.pikbest.com/wp/202408/ethereum-3d-render-of-cryptocurrency-coin_9829650.jpg!sw800" width="150" height="100" align="center">
+    </h1><button id="connectButton">Connect Wallet</button>
+   
+    
+    <div id="account"></div>
+    
+    <div id="balance"></div>
+    <script>
+        const connectButton = document.getElementById('connectButton');
+        const accountDiv = document.getElementById('account');
+        const balanceDiv = document.getElementById('balance');
+
+        let web3;
+
+        connectButton.addEventListener('click', async () => {
+            if (window.ethereum) {
+                // Request account access
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                web3 = new Web3(window.ethereum);
+
+                // Get accounts
+                const accounts = await web3.eth.getAccounts();
+                const account = accounts[0];
+                accountDiv.innerHTML = Connected Account: ${account};
+
+                // Get balance
+                const balance = await web3.eth.getBalance(account);
+                const etherBalance = web3.utils.fromWei(balance, 'ether');
+                balanceDiv.innerHTML = Balance: ${etherBalance} ETH;
+            } else {
+                accountDiv.innerHTML = 'Please install MetaMask!';
+            }
+        });
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Ether Example</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+</head>
+<body>
+    <h1 style="color: purple;">
+      Ether Transaction</h1>
+    <button id="connectButton">Connect MetaMask</button>
+    <br>
+<br>
+    
+    <div id="account"></div>
+    <div id="balance"></div>
+    <div>
+      <br>
+<br>
+        <input type="text" id="recipient" placeholder="Recipient Address" />
+        <input type="text" id="amount" placeholder="Amount in ETH" />
+        <button id="sendButton">Send Ether</button>
+        <div id="transactionStatus"></div>
+    </div>
+<br>
+<br>
+    <script>
+        const connectButton = document.getElementById('connectButton');
+        const accountDiv = document.getElementById('account');
+        const balanceDiv = document.getElementById('balance');
+        const sendButton = document.getElementById('sendButton');
+        const transactionStatus = document.getElementById('transactionStatus');
+        let web3;
+        let account;
+
+        // Check if MetaMask is installed
+        if (typeof window.ethereum !== 'undefined') {
+            console.log('MetaMask is installed!');
+        } else {alig
+            console.log('Please install MetaMask!');
+            accountDiv.innerHTML = 'Please install MetaMask!';
+        }
+
+        connectButton.addEventListener('click', async () => {
+            try {
+                // Request account access
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                account = accounts[0];
+                accountDiv.innerHTML = Connected Account: ${account};
+
+                // Initialize Web3
+                web3 = new Web3(window.ethereum);
+
+                // Get balance
+                const balance = await web3.eth.getBalance(account);
+                const etherBalance = web3.utils.fromWei(balance, 'ether');
+                balanceDiv.innerHTML = Balance: ${etherBalance} ETH;
+            } catch (error) {
+                console.error('User denied account access or an error occurred:', error);
+                accountDiv.innerHTML = 'Error connecting to MetaMask. Please try again.';
+            }
+        });
+
+        sendButton.addEventListener('click', async () => {
+            const recipient = document.getElementById('recipient').value;
+            const amount = document.getElementById('amount').value;
+
+            if (!web3.utils.isAddress(recipient)) {
+                transactionStatus.innerHTML = 'Invalid recipient address';
+                return;
+            }
+
+            try {
+                const tx = {
+                    from: account,
+                    to: recipient,
+                    value: web3.utils.toWei(amount, 'ether'),
+                    gas: '2000000',
+                };
+
+                const receipt = await web3.eth.sendTransaction(tx);
+                transactionStatus.innerHTML = Transaction successful with hash: ${receipt.transactionHash};
+            } catch (error) {
+                console.error('Transaction failed:', error);
+                transactionStatus.innerHTML = 'Transaction failed. Please check the console.';
+            }
+        });
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Contract Interaction Example</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+</head>
+<body>
+    <h1 style="color: purple;">Smart Contract Interaction</h1>
+    <button id="connectButton">Connect MetaMask</button>
+    <div id="account"></div>
+    <div>
+        <input type="text" id="contractAddress" placeholder="Contract Address" />
+        <button id="getValueButton">Get Value</button>
+        <div id="valueDisplay"></div>
+        <input type="text" id="newValue" placeholder="New Value" />
+        <button id="setValueButton">Set Value</button>
+        <div id="transactionStatus"></div>
+    </div>
+<br>
+    <script>
+        const connectButton = document.getElementById('connectButton');
+        const accountDiv = document.getElementById('account');
+        const valueDisplay = document.getElementById('valueDisplay');
+        const transactionStatus = document.getElementById('transactionStatus');
+        let web3;
+        let account;
+        let contract;
+
+        // Replace with your contract ABI and address
+        const contractABI = [
+            // Example ABI for a contract with getValue and setValue methods
+            {
+                "constant": true,
+                "inputs": [],
+                "name": "getValue",
+                "outputs": [{ "name": "", "type": "uint256" }],
+                "payable": false,
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "constant": false,
+                "inputs": [{ "name": "_value", "type": "uint256" }],
+                "name": "setValue",
+                "outputs": [],
+                "payable": false,
+                "stateMutability": "nonpayable",
+                "type": "function"
+            }
+        ];
+
+        connectButton.addEventListener('click', async () => {
+            try {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                account = accounts[0];
+                accountDiv.innerHTML = Connected Account: ${account};
+                web3 = new Web3(window.ethereum);
+            } catch (error) {
+                console.error('User denied account access or an error occurred:', error);
+                accountDiv.innerHTML = 'Error connecting to MetaMask. Please try again.';
+            }
+        });
+
+        document.getElementById('getValueButton').addEventListener('click', async () => {
+            const contractAddress = document.getElementById('contractAddress').value;
+            contract = new web3.eth.Contract(contractABI, contractAddress);
+            try {
+                const value = await contract.methods.getValue().call();
+                valueDisplay.innerHTML = Value from contract: ${value};
+            } catch (error) {
+                console.error('Error fetching value:', error);
+                valueDisplay.innerHTML = 'Error fetching value. Please check the console.';
+            }
+        });
+
+        document.getElementById('setValueButton').addEventListener('click', async () => {
+            const newValue = document.getElementById('newValue').value;
+            try {
+                const tx = await contract.methods.setValue(newValue).send({ from: account });
+                transactionStatus.innerHTML = Transaction successful with hash: ${tx.transactionHash};
+            } catch (error) {
+                console.error('Transaction failed:', error);
+                transactionStatus.innerHTML = 'Transaction failed. Please check the console.';
+            }
+        });
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ethereum Wallet Example</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+</head>
+<body>
+    <h1 style="color: purple;">Ethereum Wallet</h1>
+    <button id="connectButton">Connect MetaMask</button>
+    <div id="account"></div>
+    <div id="balance"></div>
+    <h1 style="color: purple;">Transaction History</h1>
+    <button id="getTransactionsButton">Get Transactions</button>
+    <div id="transactionList"></div>
+
+    <script>
+        const connectButton = document.getElementById('connectButton');
+        const accountDiv = document.getElementById('account');
+        const balanceDiv = document.getElementById('balance');
+        const getTransactionsButton = document.getElementById('getTransactionsButton');
+        const transactionList = document.getElementById('transactionList');
+
+        let web3;
+        let account;
+
+        // Check if MetaMask is installed
+        if (typeof window.ethereum !== 'undefined') {
+            console.log('MetaMask is installed!');
+        } else {
+            console.log('Please install MetaMask!');
+            accountDiv.innerHTML = 'Please install MetaMask!';
+        }
+
+        // Connect to MetaMask
+        connectButton.addEventListener('click', async () => {
+            try {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                account = accounts[0];
+                accountDiv.innerHTML = Connected Account: ${account};
+
+                // Initialize Web3
+                web3 = new Web3(window.ethereum);
+
+                // Get balance
+                const balance = await web3.eth.getBalance(account);
+                const etherBalance = web3.utils.fromWei(balance, 'ether');
+                balanceDiv.innerHTML = Balance: ${etherBalance} ETH;
+            } catch (error) {
+                console.error('User denied account access or an error occurred:', error);
+                accountDiv.innerHTML = 'Error connecting to MetaMask. Please try again.';
+            }
+        });
+
+        // Fetch transaction history (simplified)
+        getTransactionsButton.addEventListener('click', async () => {
+            transactionList.innerHTML = 'Fetching transactions...';
+            try {
+                const latestBlock = await web3.eth.getBlockNumber();
+                const transactions = [];
+
+                for (let i = latestBlock; i >= latestBlock - 10; i--) { // Fetch last 10 blocks
+                    const block = await web3.eth.getBlock(i, true);
+                    if (block && block.transactions) {
+                        block.transactions.forEach(tx => {
+                            if (tx.from === account || tx.to === account) {
+                                transactions.push({
+                                    hash: tx.hash,
+                                    from: tx.from,
+                                    to: tx.to,
+                                    value: web3.utils.fromWei(tx.value, 'ether'),
+                                    block: i,
+                                    timestamp: new Date(block.timestamp * 1000).toLocaleString()
+                                });
+                            }
+                        });
+                    }
+                }
+
+                // Display transactions
+                transactionList.innerHTML = '';
+                if (transactions.length > 0) {
+                    transactions.forEach(tx => {
+                        transactionList.innerHTML += `
+                            <div>
+                                <strong>Transaction Hash:</strong> ${tx.hash}<br>
+                                <strong>From:</strong> ${tx.from}<br>
+                                <strong>To:</strong> ${tx.to}<br>
+                                <strong>Value:</strong> ${tx.value} ETH<br>
+                                <strong>Block:</strong> ${tx.block}<br>
+                                <strong>Timestamp:</strong> ${tx.timestamp}<br>
+                                <hr>
+                            </div>`;
+                    });
+                } else {
+                    transactionList.innerHTML = 'No transactions found.';
+                }
+            } catch (error) {
+                console.error('Error fetching transactions:', error);
+                transactionList.innerHTML = 'Error fetching transactions. Please check the console.';
+            }
+        });
+    </script>
+</body>
+</html>
+
+
